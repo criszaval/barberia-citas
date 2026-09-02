@@ -22,4 +22,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+use App\Http\Controllers\StaffDashboardController;
+
+// Rutas protegidas para personal / empleados
+Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () {
+    Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+    Route::patch('/appointments/{appointment}/status', [StaffDashboardController::class, 'updateStatus'])->name('appointments.updateStatus');
+});
+
 require __DIR__.'/auth.php';
