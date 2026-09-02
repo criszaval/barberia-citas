@@ -53,4 +53,9 @@ class User extends Authenticatable
 {
     return $this->hasOne(StaffProfile::class);
 }
+
+public function appointments()
+{
+    return $this->hasMany(Appointment::class, 'client_id');
+}
 }
