@@ -24,4 +24,9 @@ class StaffProfile extends Model
 {
     return $this->belongsToMany(Service::class, 'service_staff');
 }
+
+public function schedules()
+{
+    return $this->hasMany(Schedule::class);
+}
 }
