@@ -5,93 +5,79 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\StaffProfile;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AppointmentController extends Controller
 {
     /**
-     * Muestra la vista principal para agendar una cita.
+     * Muestra el formulario público para agendar una cita.
      */
     public function create()
     {
-        $services = Service::where('is_active', true)->get();
-        $staffMembers = StaffProfile::where('is_active', true)->with('user', 'services')->get();
+        $services = Service::all();
+        $staffMembers = StaffProfile::with('user')->get();
 
         return view('appointments.create', compact('services', 'staffMembers'));
     }
 
     /**
-     * Procesa y guarda la reserva de la cita.
+     * Almacena una nueva cita verificando disponibilidades y cruces de horario.
      */
     public function store(Request $request)
     {
-        // 1. Validar los datos ingresados en el formulario
         $request->validate([
-            'service_id'       => 'required|exists:services,id',
             'staff_profile_id' => 'required|exists:staff_profiles,id',
+            'service_id'       => 'required|exists:services,id',
             'appointment_date' => 'required|date|after_or_equal:today',
             'start_time'       => 'required|date_format:H:i',
-            'name'             => 'required|string|max:255',
-            'email'            => 'required|email|max:255',
-            'phone'            => 'required|string|max:20',
-            'create_account'   => 'nullable|boolean',
-            'password'         => 'required_if:create_account,1|nullable|min:8',
+            'guest_name'       => 'required|string|max:255',
+            'guest_email'      => 'required|email|max:255',
+            'guest_phone'      => 'required|string|max:20',
         ]);
 
+        // 1. Obtener la duración del servicio seleccionado
         $service = Service::findOrFail($request->service_id);
-
-        // 2. Calcular hora de inicio y fin según la duración del servicio
-        $startTime = Carbon::createFromFormat('H:i', $request->start_time);
+        
+        // 2. Parsear la hora de forma flexible con Carbon (admite H:i o H:i:s)
+        $startTime = Carbon::parse($request->start_time);
         $endTime   = (clone $startTime)->addMinutes($service->duration_minutes);
 
-        $clientId = null;
+        $startTimeStr = $startTime->format('H:i:s');
+        $endTimeStr   = $endTime->format('H:i:s');
 
-        // 3. Manejar la identidad del cliente (Logueado vs Nuevo Usuario vs Invitado)
-        if (Auth::check()) {
-            // Usuario con sesión activa
-            $clientId = Auth::id();
-        } elseif ($request->boolean('create_account')) {
-            // Invitado que activó "Crear una cuenta"
-            
-            // Validar que el correo no esté registrado previamente
-            $request->validate([
-                'email' => 'unique:users,email',
-            ], [
-                'email.unique' => 'Este correo ya está registrado. Por favor inicia sesión.',
-            ]);
+        // 3. Validar si ya existe una cita confirmada o pendiente que choque en ese rango para el mismo empleado
+        $hasOverlap = Appointment::where('staff_profile_id', $request->staff_profile_id)
+            ->where('appointment_date', $request->appointment_date)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where(function ($query) use ($startTimeStr, $endTimeStr) {
+                $query->where('start_time', '<', $endTimeStr)
+                      ->where('end_time', '>', $startTimeStr);
+            })
+            ->exists();
 
-            $user = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'phone'    => $request->phone,
-                'password' => Hash::make($request->password),
-                'role'     => 'client',
-            ]);
-
-            // Iniciar sesión automáticamente al nuevo usuario
-            Auth::login($user);
-            $clientId = $user->id;
+        if ($hasOverlap) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['start_time' => 'El horario seleccionado ya no está disponible con este barbero/empleado. Por favor elige otro horario.']);
         }
 
-        // 4. Guardar la cita en la base de datos
-        $appointment = Appointment::create([
-            'service_id'       => $request->service_id,
+        // 4. Crear la reserva
+        Appointment::create([
+            'client_id'        => Auth::check() ? Auth::id() : null,
             'staff_profile_id' => $request->staff_profile_id,
-            'client_id'        => $clientId,
-            'guest_name'       => $request->name,
-            'guest_email'      => $request->email,
-            'guest_phone'      => $request->phone,
+            'service_id'       => $request->service_id,
             'appointment_date' => $request->appointment_date,
-            'start_time'       => $startTime->format('H:i:s'),
-            'end_time'         => $endTime->format('H:i:s'),
+            'start_time'       => $startTimeStr,
+            'end_time'         => $endTimeStr,
             'status'           => 'pending',
-            'notes'            => $request->input('notes'),
+            'guest_name'       => $request->guest_name,
+            'guest_email'      => $request->guest_email,
+            'guest_phone'      => $request->guest_phone,
         ]);
 
-        return redirect()->back()->with('success', '¡Cita agendada exitosamente!');
+        return redirect()->route('appointments.create')
+            ->with('success', '¡Tu cita ha sido reservada con éxito! Nos pondremos en contacto para confirmar.');
     }
 }

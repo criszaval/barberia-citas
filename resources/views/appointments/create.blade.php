@@ -23,6 +23,9 @@
         <form action="{{ route('appointments.store') }}" method="POST" x-data="{ createAccount: false }">
             @csrf
 
+            <!-- 1. Servicio y Especialista -->
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-3">1. Servicio y Especialista</h3>
+
             <!-- Selección de Servicio -->
             <div class="mb-4">
                 <label for="service_id" class="block font-medium text-sm text-gray-700">Selecciona un Servicio</label>
@@ -63,31 +66,32 @@
 
             <hr class="my-6 border-gray-200">
 
-            <h3 class="text-lg font-semibold text-gray-700 mb-3">Datos del Cliente</h3>
+            <!-- 2. Datos del Cliente -->
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-3">2. Datos del Cliente</h3>
 
             @auth
                 <!-- Si el usuario ya está autenticado -->
                 <div class="p-4 bg-gray-50 border rounded-md mb-4">
                     <p class="text-sm text-gray-600">Reservando como: <strong>{{ auth()->user()->name }}</strong> ({{ auth()->user()->email }})</p>
-                    <input type="hidden" name="name" value="{{ auth()->user()->name }}">
-                    <input type="hidden" name="email" value="{{ auth()->user()->email }}">
-                    <input type="hidden" name="phone" value="{{ auth()->user()->phone ?? 'N/A' }}">
+                    <input type="hidden" name="guest_name" value="{{ auth()->user()->name }}">
+                    <input type="hidden" name="guest_email" value="{{ auth()->user()->email }}">
+                    <input type="hidden" name="guest_phone" value="{{ auth()->user()->phone ?? 'N/A' }}">
                 </div>
             @else
-                <!-- Si el cliente es invitado -->
+                <!-- Si el cliente es invitado (se cambió name="name" por name="guest_name", etc.) -->
                 <div class="mb-4">
-                    <label for="name" class="block font-medium text-sm text-gray-700">Nombre Completo</label>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" required class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <label for="guest_name" class="block font-medium text-sm text-gray-700">Nombre Completo</label>
+                    <input type="text" name="guest_name" id="guest_name" value="{{ old('guest_name') }}" placeholder="Ej. Juan Pérez" required class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="email" class="block font-medium text-sm text-gray-700">Correo Electrónico</label>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}" required class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <label for="guest_email" class="block font-medium text-sm text-gray-700">Correo Electrónico</label>
+                        <input type="email" name="guest_email" id="guest_email" value="{{ old('guest_email') }}" placeholder="correo@ejemplo.com" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
                     <div>
-                        <label for="phone" class="block font-medium text-sm text-gray-700">Teléfono / WhatsApp</label>
-                        <input type="text" name="phone" id="phone" value="{{ old('phone') }}" required class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <label for="guest_phone" class="block font-medium text-sm text-gray-700">Teléfono / WhatsApp</label>
+                        <input type="tel" name="guest_phone" id="guest_phone" value="{{ old('guest_phone') }}" placeholder="70000000" maxlength="12" required pattern="^[0-9]{4}[- ]?[0-9]{4}$" oninput="this.value = this.value.replace(/[^0-9-]/g, '');" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
                 </div>
 
@@ -100,16 +104,16 @@
                 </div>
 
                 <!-- Campo de contraseña -->
-                <div class="mb-4" x-show="createAccount" style="display: none;">
+                <div class="mb-4" x-show="createAccount" x-cloak>
                     <label for="password" class="block font-medium text-sm text-gray-700">Crea tu Contraseña</label>
-                    <input type="password" name="password" id="password" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Mínimo 8 caracteres">
+                    <input type="password" name="password" id="password" minlength="8" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Mínimo 8 caracteres">
                 </div>
             @endauth
 
             <!-- Notas Adicionales -->
             <div class="mb-6">
                 <label for="notes" class="block font-medium text-sm text-gray-700">Notas / Preferencias (Opcional)</label>
-                <textarea name="notes" id="notes" rows="2" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes') }}</textarea>
+                <textarea name="notes" id="notes" rows="2" placeholder="Detalles extra sobre tu solicitud..." class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes') }}</textarea>
             </div>
 
             <!-- Botón de Envío -->
