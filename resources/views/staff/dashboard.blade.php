@@ -15,6 +15,12 @@
                     </div>
                 @endif
 
+                @if (session('error'))
+                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <h3 class="text-lg font-bold text-gray-800 mb-4">Próximas Citas Asignadas</h3>
 
                 @if($appointments->isEmpty())
@@ -42,17 +48,17 @@
                                             {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
                                         </td>
                                         <td class="p-3">
-                                            <strong>{{ $appointment->guest_name }}</strong>
+                                            <strong>{{ $appointment->guest_name ?? $appointment->client->name ?? 'Cliente' }}</strong>
                                             @if($appointment->client_id)
                                                 <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded ml-1">Registrado</span>
                                             @else
                                                 <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded ml-1">Invitado</span>
                                             @endif
                                         </td>
-                                        <td class="p-3">{{ $appointment->service->name }}</td>
+                                        <td class="p-3">{{ $appointment->service->name ?? 'Servicio' }}</td>
                                         <td class="p-3 text-xs text-gray-600">
-                                            <div>📞 {{ $appointment->guest_phone }}</div>
-                                            <div>✉️ {{ $appointment->guest_email }}</div>
+                                            <div>📞 {{ $appointment->guest_phone ?? '-' }}</div>
+                                            <div>✉️ {{ $appointment->guest_email ?? '-' }}</div>
                                         </td>
                                         <td class="p-3">
                                             @switch($appointment->status)
@@ -70,17 +76,23 @@
                                                     @break
                                             @endswitch
                                         </td>
-                                        <td class="p-3 text-center">
-                                            <form action="{{ route('staff.appointments.updateStatus', $appointment) }}" method="POST" class="inline-block">
-                                                @csrf
-                                                @method('PATCH')
-                                                <select name="status" onchange="this.form.submit()" class="text-xs border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500">
-                                                    <option value="pending" {{ $appointment->status == 'pending' ? 'selected' : '' }}>Pendiente</option>
-                                                    <option value="confirmed" {{ $appointment->status == 'confirmed' ? 'selected' : '' }}>Confirmar</option>
-                                                    <option value="completed" {{ $appointment->status == 'completed' ? 'selected' : '' }}>Completar</option>
-                                                    <option value="cancelled" {{ $appointment->status == 'cancelled' ? 'selected' : '' }}>Cancelar</option>
-                                                </select>
-                                            </form>
+                                        <td class="p-3 text-center whitespace-nowrap">
+                                            @if($appointment->status === 'completed' || $appointment->status === 'cancelled')
+                                                <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-md border border-gray-300 inline-flex items-center gap-1">
+                                                    🔒 Bloqueada
+                                                </span>
+                                            @else
+                                                <form action="{{ route('staff.appointments.updateStatus', $appointment) }}" method="POST" class="inline-block">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <select name="status" onchange="this.form.submit()" class="text-xs border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500">
+                                                        <option value="pending" {{ $appointment->status == 'pending' ? 'selected' : '' }}>Pendiente</option>
+                                                        <option value="confirmed" {{ $appointment->status == 'confirmed' ? 'selected' : '' }}>Confirmar</option>
+                                                        <option value="completed" {{ $appointment->status == 'completed' ? 'selected' : '' }}>Completar</option>
+                                                        <option value="cancelled" {{ $appointment->status == 'cancelled' ? 'selected' : '' }}>Cancelar</option>
+                                                    </select>
+                                                </form>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

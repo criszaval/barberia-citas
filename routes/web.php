@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -32,6 +33,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
+
+    // Gestión global de citas para el Admin
+    Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
+    Route::patch('/appointments/{appointment}/status', [AdminAppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
 
     // CRUD de Servicios (hereda prefix 'admin' y name 'admin.')
     Route::resource('services', ServiceController::class);
