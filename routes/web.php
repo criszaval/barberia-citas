@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ClientAppointmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffDashboardController;
@@ -45,7 +46,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('staff', StaffController::class);
 });
 
+// Rutas protegidas para clientes autenticados y perfil de usuario
 Route::middleware('auth')->group(function () {
+    Route::get('/mis-citas', [ClientAppointmentController::class, 'index'])->name('client.appointments.index');
+    Route::get('/mis-citas/{appointment}/editar', [ClientAppointmentController::class, 'edit'])->name('client.appointments.edit');
+    Route::put('/mis-citas/{appointment}', [ClientAppointmentController::class, 'update'])->name('client.appointments.update');
+    
+    // Nueva ruta de cancelación para el cliente
+    Route::patch('/mis-citas/{appointment}/cancelar', [ClientAppointmentController::class, 'cancel'])->name('client.appointments.cancel');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
