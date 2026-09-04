@@ -1,4 +1,35 @@
 <x-guest-layout>
+    <!-- Header / Navegación Superior -->
+    <header class="w-full bg-white border-b border-gray-200 shadow-sm py-4 px-6">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <!-- Nombre del Negocio / Logotipo -->
+            <a href="{{ route('appointments.create') }}" class="text-xl font-bold text-gray-800 hover:text-indigo-600 transition">
+                Barbería
+            </a>
+
+            <!-- Botones de Autenticación -->
+            <nav class="flex items-center space-x-3">
+                @if (Route::has('login'))
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md transition">
+                            Ir al Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md transition">
+                            Iniciar Sesión
+                        </a>
+
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md shadow-sm transition">
+                                Registrarse
+                            </a>
+                        @endif
+                    @endauth
+                @endif
+            </nav>
+        </div>
+    </header>
+
     <div class="max-w-2xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Agendar Cita</h2>
 
@@ -78,7 +109,7 @@
                     <input type="hidden" name="guest_phone" value="{{ auth()->user()->phone ?? 'N/A' }}">
                 </div>
             @else
-                <!-- Si el cliente es invitado (se cambió name="name" por name="guest_name", etc.) -->
+                <!-- Si el cliente es invitado -->
                 <div class="mb-4">
                     <label for="guest_name" class="block font-medium text-sm text-gray-700">Nombre Completo</label>
                     <input type="text" name="guest_name" id="guest_name" value="{{ old('guest_name') }}" placeholder="Ej. Juan Pérez" required class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
