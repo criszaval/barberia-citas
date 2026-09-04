@@ -56,14 +56,16 @@
                                             <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Inactivo</span>
                                         @endif
                                     </td>
-                                    <td class="p-3 text-right space-x-2">
-                                        <a href="{{ route('admin.staff.edit', $staff->id) }}" class="text-indigo-600 hover:text-indigo-900 font-medium">Editar</a>
-                                        
-                                        <form action="{{ route('admin.staff.destroy', $staff->id) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar a este barbero?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 font-medium">Eliminar</button>
-                                        </form>
+                                    <td class="p-3 text-right whitespace-nowrap">
+                                        <div class="flex items-center justify-end space-x-3">
+                                            <a href="{{ route('admin.staff.edit', $staff->id) }}" class="text-indigo-600 hover:text-indigo-900 font-medium">Editar</a>
+                                            
+                                            <form action="{{ route('admin.staff.destroy', $staff->id) }}" method="POST" class="inline-block m-0" onsubmit="return confirm('¿Estás seguro de eliminar a este barbero?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900 font-medium">Eliminar</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
