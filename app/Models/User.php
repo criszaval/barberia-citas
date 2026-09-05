@@ -58,4 +58,8 @@ public function appointments()
 {
     return $this->hasMany(Appointment::class, 'client_id');
 }
+public function clientAppointments()
+{
+    return $this->hasMany(Appointment::class, 'client_id');
+}
 }

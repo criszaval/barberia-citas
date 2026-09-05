@@ -11,18 +11,28 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-2">¡Bienvenido Administrador!</h3>
                 <p class="text-gray-600 mb-6">Desde aquí tendrás visión global de la barbería, reportes y gestión de personal.</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <!-- Agenda Global -->
-                  <!-- Agenda Global -->
-<div class="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex flex-col justify-between">
-    <div>
-        <h4 class="font-semibold text-indigo-900">Agenda Global</h4>
-        <p class="text-sm text-indigo-700 mt-1">Ver y gestionar citas de todos los empleados.</p>
-    </div>
-    <a href="{{ route('admin.appointments.index') }}" style="background-color: #4f46e5; color: #ffffff;" class="inline-block mt-4 text-xs bg-indigo-600 text-white font-semibold py-2 px-3 rounded text-center hover:bg-indigo-700 transition">
-        Ver Citas Totales
-    </a>
-</div>
+                    <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-semibold text-indigo-900">Agenda Global</h4>
+                            <p class="text-sm text-indigo-700 mt-1">Ver y gestionar citas de todos los empleados.</p>
+                        </div>
+                        <a href="{{ route('admin.appointments.index') }}" style="background-color: #4f46e5; color: #ffffff;" class="inline-block mt-4 text-xs bg-indigo-600 text-white font-semibold py-2 px-3 rounded text-center hover:bg-indigo-700 transition">
+                            Ver Citas Totales
+                        </a>
+                    </div>
+
+                    <!-- Clientes Registrados (NUEVO) -->
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-semibold text-blue-900">Clientes</h4>
+                            <p class="text-sm text-blue-700 mt-1">Ver listado de clientes registrados en el sistema.</p>
+                        </div>
+                        <a href="{{ route('admin.clients.index') }}" style="background-color: #2563eb; color: #ffffff;" class="inline-block mt-4 text-xs bg-blue-600 text-white font-semibold py-2 px-3 rounded text-center hover:bg-blue-700 transition">
+                            Ver Clientes
+                        </a>
+                    </div>
 
                     <!-- Servicios (Conectado al CRUD) -->
                     <div class="p-4 bg-green-50 border border-green-200 rounded-lg flex flex-col justify-between">

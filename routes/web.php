@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
     Route::patch('/appointments/{appointment}/status', [AdminAppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
 
-    // CRUD de Servicios (hereda prefix 'admin' y name 'admin.')
+    // Listado de Clientes
+    Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
+
+    // CRUD de Servicios 
     Route::resource('services', ServiceController::class);
 
     // CRUD de Barberos / Personal
@@ -52,7 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/mis-citas/{appointment}/editar', [ClientAppointmentController::class, 'edit'])->name('client.appointments.edit');
     Route::put('/mis-citas/{appointment}', [ClientAppointmentController::class, 'update'])->name('client.appointments.update');
     
-    // Nueva ruta de cancelación para el cliente
+    // Ruta de cancelación para el cliente
     Route::patch('/mis-citas/{appointment}/cancelar', [ClientAppointmentController::class, 'cancel'])->name('client.appointments.cancel');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
