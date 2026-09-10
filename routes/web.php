@@ -18,6 +18,11 @@ Route::get('/', function () {
 // Rutas públicas para la reserva de citas
 Route::get('/reservar', [AppointmentController::class, 'create'])->name('appointments.create');
 Route::post('/reservar', [AppointmentController::class, 'store'])->name('appointments.store');
+Route::get('/citas/consultar/{token}', [AppointmentController::class, 'show'])->name('appointments.show');
+Route::get('/citas/consultar/{token}/json', [AppointmentController::class, 'jsonStatus'])->name('appointments.json');
+Route::get('/citas/consultar/{token}/editar', [AppointmentController::class, 'editByToken'])->name('appointments.edit-by-token');
+Route::put('/citas/consultar/{token}', [AppointmentController::class, 'updateByToken'])->name('appointments.update-by-token');
+Route::patch('/citas/consultar/{token}/cancelar', [AppointmentController::class, 'cancelByToken'])->name('appointments.cancel-by-token');
 
 // Redirección centralizada tras login según el rol
 Route::get('/dashboard', [DashboardController::class, 'index'])

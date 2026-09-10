@@ -10,17 +10,17 @@ class Appointment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service_id',
-        'staff_profile_id',
         'client_id',
-        'guest_name',
-        'guest_email',
-        'guest_phone',
+        'staff_profile_id',
+        'service_id',
         'appointment_date',
         'start_time',
         'end_time',
         'status',
-        'notes',
+        'guest_name',
+        'guest_email',
+        'guest_phone',
+        'token',
     ];
 
     public function service()
