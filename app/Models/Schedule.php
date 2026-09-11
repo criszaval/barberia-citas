@@ -17,6 +17,11 @@ class Schedule extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'day_of_week' => 'integer',
+        'is_active' => 'boolean',
+    ];
+
     public function staffProfile()
     {
         return $this->belongsTo(StaffProfile::class);
