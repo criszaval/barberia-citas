@@ -12,6 +12,11 @@ use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use Illuminate\Support\Facades\Route;
 
+
+// ============================================================
+// RUTA PRINCIPAL
+// ============================================================
+
 Route::get('/', function () {
     return redirect()->route('appointments.create');
 });
@@ -77,7 +82,7 @@ Route::middleware(['auth', 'role:staff,admin'])
     ->name('staff.')
     ->group(function () {
 
-        // Dashboard del barbero
+        // Dashboard del staff
         Route::get('/dashboard', [StaffDashboardController::class, 'index'])
             ->name('dashboard');
 
@@ -105,11 +110,9 @@ Route::middleware(['auth', 'role:staff,admin'])
         // HORARIO PERSONAL DEL BARBERO
         // ====================================================
 
-        // Mostrar horario
         Route::get('/schedule', [StaffScheduleController::class, 'index'])
             ->name('schedule.index');
 
-        // Guardar / actualizar horario
         Route::put('/schedule', [StaffScheduleController::class, 'update'])
             ->name('schedule.update');
     });
@@ -124,10 +127,12 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Dashboard del administrador
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        // ====================================================
+        // DASHBOARD DEL ADMINISTRADOR
+        // ====================================================
+
+        Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])
+            ->name('dashboard');
 
         // ====================================================
         // GESTIÓN GLOBAL DE CITAS
@@ -150,6 +155,13 @@ Route::middleware(['auth', 'role:admin'])
         // ====================================================
 
         Route::resource('staff', StaffController::class);
+
+        // ====================================================
+        // LISTADO DE CLIENTES
+        // ====================================================
+
+        Route::get('/clients', [ClientController::class, 'index'])
+            ->name('clients.index');
     });
 
 
@@ -174,6 +186,7 @@ Route::middleware('auth')->group(function () {
 
     Route::patch('/mis-citas/{appointment}/cancelar', [ClientAppointmentController::class, 'cancel'])
         ->name('client.appointments.cancel');
+
 
     // ========================================================
     // PERFIL
